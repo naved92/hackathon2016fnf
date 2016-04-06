@@ -156,3 +156,18 @@ class Profileposts:
     def __init__(self):
         self.post_info = Post()
         self.alignment=""
+
+class Rating(models.Model):
+
+    rated_user=models.ForeignKey(UserProfile,related_name="rated_user")
+    rated_by_user=models.ForeignKey(UserProfile,related_name="rated_by_user")
+    rating_event_choices = (
+        ('R', 'Rating'),
+        ('CT', 'Create Trip'),
+        ('ST', 'Share Trip'),
+        ('P', 'Posting'),
+
+    )
+    rating_event = models.CharField(blank=False, max_length=5, choices=rating_event_choices, default='R')
+    rating_event_id=models.IntegerField(blank=False,null=True)
+    earned_rating=models.IntegerField(blank=False,null=True)
