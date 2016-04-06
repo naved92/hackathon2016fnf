@@ -1,0 +1,131 @@
+{% extends 'base.html' %}
+{% load staticfiles %}
+<!DOCTYPE html>
+{% block title %}Share your trip{% endblock %}
+{% block body_block %}
+
+
+
+
+
+<div class="panel-body">
+
+    <div class="row">
+        <div class="col-md-4">
+
+
+        </div>
+                        <div class="col-md-4">
+    <form id="sharetrip-form" action="{% url 'sharetrip' %}" method="post" role="form"
+                                      style="display: block;"> {% csrf_token %}
+                                    {% csrf_token %}
+
+
+                                    <input type="hidden" name="next" value="{{ request.GET.next }}"/>
+
+                                    <div class="form-group">
+                                        <input type="text" name="source" id="source" tabindex="1"
+                                               class="form-control" placeholder="Source" value="">
+                                    </div>
+
+                                    <div class="form-group">
+                                        <input type="text" name="destination" id="destination" tabindex="2"
+                                               class="form-control" placeholder="destination">
+                                    </div>
+
+
+            <div class="form-group">
+                <div class='input-group date' id='datetimepicker1' name="trip_time">
+                    <input type='text' class="form-control" />
+                    <span class="input-group-addon">
+                        <span class="glyphicon glyphicon-calendar"></span>
+                    </span>
+        <script type="text/javascript">
+            $(function () {
+                $('#datetimepicker1').datetimepicker();
+            });
+        </script>
+    </div>
+</div>
+
+     <div class="form-group">
+  <label for="cars">Select your car to share:</label>
+  <select class="form-control" id="car" name="car">
+    {% for car in cars %}
+
+    <option>{{ car.registration_number }}</option>
+    {% endfor %}
+     </select>
+</div>
+
+                                    <div class="form-group">
+                                        <div class="row">
+                                            <div class="col-sm-6 col-sm-offset-3">
+                                                <input type="submit" name="sharecar-submit" id="sharecaR-submit"
+                                                       tabindex="4" class="form-control btn btn-register"
+                                                       value="Share Trip">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </form>
+                        </div>
+    </div>
+    </div>
+
+
+           <div>
+
+    <hr>
+    <hr>
+    </div>
+
+    <div class="container">
+        <div class="col-md-4">
+
+        </div>
+        <div class="col-md-4">
+                Cars owned by {{ request.user.username }}
+
+        </div>
+
+
+
+    </div>
+
+
+    <div class="container">
+  <h2>Cars list</h2>
+  <div class="table-responsive">
+  <table class="table">
+    <thead>
+      <tr>
+        <th>Registration number</th>
+        <th>Model</th>
+        <th>Number of seats</th>
+
+      </tr>
+    </thead>
+    <tbody>
+
+    {% for car in cars %}
+
+      <tr>
+
+        <td>      {{ car.registration_number }}
+          </td>
+        <td>      {{ car.car_model }}
+          </td>
+        <td>      {{ car.number_of_seats }}
+          </td>
+      </tr>
+
+    {%  endfor %}
+        </tbody>
+  </table>
+  </div>
+</div>
+
+
+
+{% endblock %}
+    

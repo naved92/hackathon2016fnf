@@ -18,4 +18,7 @@ urlpatterns = [
         url(r'^block/(?P<user_id>[0-9]+)/$', views.block, name='block'),
         url(r'^unblock/(?P<user_id>[0-9]+)/$', views.unblock, name='unblock'),
         url(r'^change_password/$',views.change_password, name='change_password'),
+        url(r'^cars/$', views.cars,name='cars'),
+        url(r'^sharetrip/$', views.sharetrip,name='sharetrip'),
+
         ]

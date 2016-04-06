@@ -1,3 +1,5 @@
+
+
 from django.template import RequestContext
 from django.shortcuts import render_to_response, render
 from django.contrib.auth import authenticate, login, logout
@@ -24,7 +26,7 @@ import sys
 import requests
 
 from .forms import VerificationForm, PasswordChangeForm
-from carpool.models import User, UserProfile, Post,Profileposts,Block,Location
+from carpool.models import User, UserProfile, Post,Profileposts,Block,Location,Car,Trip
 from carpool.forms import RegistrationForm,UpdateProfileForm
 
 # utility functions
@@ -552,6 +554,100 @@ def user_logout(request):
 
     # Take the user back to the homepage.
     return HttpResponseRedirect('/carpool/')
+
+@login_required(login_url='/carpool/')
+def cars(request):
+
+    """
+    Shows the post of a user within the range
+    :param request:The HTMLRequest
+    :param
+    :return:  if the user is not logged in,it redirects to the index page
+             else if the user is not verified,it redirects to 'verification.html'
+             else if the requesting user is blocked by the requested user or has blocked requested user,an error page is shown
+            else shows the cars owned by the user,or add the car
+    """
+    context = RequestContext(request)
+
+    user_profile = request.user.userprofile
+    if user_profile.verification_status == 'p':
+        return HttpResponseRedirect(reverse('verification'))
+    else:
+        owner_of_car=UserProfile.objects.get(user=request.user)
+        print(owner_of_car.user.username)
+        cars=Car.objects.filter(owner=owner_of_car)
+
+        """
+        if request.POST:
+
+            post_maker=UserProfile.objects.get(user=request.user)
+            post_text=request.POST.get('status')
+            post_time=datetime.now()
+            post=Post(post_maker=post_maker,post_text=post_text,post_time=post_time,post_sharecount=0)
+            if request.FILES.get('post_photo'):
+                uploaded_file = request.FILES.get('post_photo')
+          #      print(uploaded_file.name)
+                parts=uploaded_file.name.split(".")
+                #print(parts)
+                joinstring=""+post_maker.user.username+'_'+str(post_time)+'.'+parts[len(parts)-1]
+                uploaded_file.name = joinstring
+                post.post_photo = uploaded_file
+
+            post.save()
+        """
+
+        if request.POST:
+            car_owner=UserProfile.objects.get(user=request.user)
+            car_registration_number=request.POST.get('registration_number')
+            car_model=request.POST.get('model')
+            car_number_of_seats=request.POST.get('number_of_seats')
+            car=Car(owner=car_owner,registration_number=car_registration_number,car_model=car_model,number_of_seats=car_number_of_seats)
+            car.save()
+
+
+        return render_to_response('car.html', {'cars':cars,'place':"Dhaka",'place_lat':123.45,'place_long':123.45}, context)
+
+
+
+@login_required(login_url='/carpool/')
+def sharetrip(request):
+    """
+    Shares the trip of a user
+    :param request:The HTMLRequest
+    :param
+    :return:  if the user is not logged in,it redirects to the index page
+             else if the user is not verified,it redirects to 'verification.html'
+             else if the requesting user is blocked by the requested user or has blocked requested user,an error page is shown
+            else shares the trip redirects to previous trip page
+
+    """
+    context = RequestContext(request)
+    user_profile = request.user.userprofile
+    if user_profile.verification_status == 'p':
+        return HttpResponseRedirect(reverse('verification'))
+    elif request.POST:
+
+        source_location=Location(location_name="Dhaka",location_lat="24.019",location_long="90.4180")
+        source_location.save()
+
+        destination_location=Location(location_name="Dhaka",location_lat="24.019",location_long="90.4180")
+        destination_location.save()
+
+        trip_time=request.POST.get('trip_time')
+        car_reg=request.POST.get('car')
+        trip_car=Car.objects.get(registration_number=car_reg)
+
+        newTripOffer=Trip(source=source_location,destination=destination_location,trip_time=trip_time,car_of_trip=trip_car)
+        newTripOffer.save()
+
+
+        return HttpResponseRedirect(reverse('sharetrip'))
+    else:
+        owner_of_car=UserProfile.objects.get(user=request.user)
+        print(owner_of_car.user.username)
+        cars=Car.objects.filter(owner=owner_of_car)
+
+        return render_to_response('sharetrip.html', {'cars':cars}, context_instance=RequestContext(request))
 
 @login_required(login_url='/carpool/')
 def spread(request,post_id):

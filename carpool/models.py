@@ -84,6 +84,7 @@ class Trip(models.Model):
     destination=models.ForeignKey(Location,related_name="destination")
     driver_of_trip=models.ForeignKey(Driver)
     trip_time=models.DateTimeField(blank=True)
+    car_of_trip=models.ForeignKey(Car)
 
 class TripRequest(models.Model):
 
