@@ -23,6 +23,6 @@ from django.contrib import admin
 urlpatterns = [
     url(r'^$', include('carpool.urls')),
     url(r'^admin/', include(admin.site.urls)),
-    url(r'^carpool/', include('carpool.urls')),
+    url(r'^sharecar/', include('carpool.urls')),
 
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
