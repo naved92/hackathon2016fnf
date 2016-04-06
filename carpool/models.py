@@ -21,6 +21,7 @@ class UserProfile(models.Model):
     about_me = models.CharField(blank=True, max_length=300)
     picture = models.ImageField(upload_to='profile_images', blank=True)
     last_location = models.CharField(blank=True, max_length=300)
+    user_NID=models.CharField(blank=True,null=True,max_length=30)
     verification_status_choices = (
         ('a', 'active'),
         ('d', 'deactive'),
@@ -70,6 +71,8 @@ class Driver(models.Model):
     driver_name=models.CharField(blank=True,null=True,max_length=50)
     driver_employer=models.ForeignKey(UserProfile)
     driver_address=models.CharField(blank=True,null=True,max_length=300)
+    driver_NID=models.CharField(blank=True,null=True,max_length=30)
+
 
 
 class Trip(models.Model):

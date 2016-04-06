@@ -445,8 +445,10 @@ def register(request):
                 username=form.cleaned_data['username'],
                 password=form.cleaned_data['password1'],
                 email=form.cleaned_data['email']
+
             )
             userprofile=UserProfile(user=user_temp)
+            userprofile.user_NID=form.cleaned_data['NID']
             userprofile.save()
         #    print(userprofile.user.username)
             user = authenticate(username=form.cleaned_data['username'], password=form.cleaned_data['password1'])

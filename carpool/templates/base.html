@@ -66,13 +66,25 @@
                     </a>
 
                 </div>
+
+                <div>
+                    <hr>
+                    <hr>
+                </div>
                 <div class="collapse navbar-collapse">
                     <ul class="nav navbar-nav navbar-right">
+
                         <li><a href="{% url 'newsfeed' %}">Home</a></li>
                         <li><a href="{% url 'aboutus' %}">About Us</a></li>
                         <li><a href="{% url 'profile' user.id %}">My profile</a></li>
+                        <li><a>Car</a></li>
+                        <li><a>Trip Request</a></li>
+                        <li><a>Share trip</a></li>
+                        <li><a>Pending Requests</a></li>
+                        <li><a>Previous Trips</a></li>
                         <li><a href="{% url 'updateinfo' %}">Update Info</a></li>
                         <li><a href="{% url 'logout' %}">Logout</a></li>
+
                         </ul>
                 </div>
                 <!--

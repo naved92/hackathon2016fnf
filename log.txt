@@ -30,4 +30,6 @@ exit;
 
 10- makemigrate migrate syncdb
 11-whole database import from testsharethis
-12-
+12-edited location related parts so that no hang
+13-slider changes
+14-added navigation panel,but no view and routing yet
