@@ -1,0 +1,29 @@
+1-$django-admin startproject hackathon2016fnf
+
+2-cd hackathon2016fnf
+3-$python manage.py migrate
+4-$python manage.py startapp carpool
+
+5-python manage.py createsuperuser   #imtiaznaved@gmail.com [naved,naved92]
+6-DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'carpooldb',
+        'USER': 'carpooluser',
+        'PASSWORD': 'carpool',
+        'HOST': 'localhost',
+        'PORT': '',
+    }
+}
+
+7-model imported from hackathonfnf.models
+8-admin imported too
+9-$python manage.py makemigrations,migrate,syncdb
+
+mysql -u root -p
+CREATE DATABASE hackathonfnfdb CHARACTER SET UTF8;
+CREATE USER hackathonfnfuser@localhost IDENTIFIED BY 'hackathonfnf';
+GRANT ALL PRIVILEGES ON *.* TO hackathonfnfuser@localhost;
+FLUSH PRIVILEGES;
+exit;
+
