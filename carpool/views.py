@@ -57,9 +57,14 @@ def get_location(ip):
             u'zip_code': u''
             }
 
+
     """
-    url = 'http://freegeoip.net/json/'
+    #CAPS
+    #url = 'http://freegeoip.net/json/'
+    url="http://geoip.nekudo.com/api/"
+    ip="116.58.202.54"
     url += str(ip)
+    print(url)
     try:
         with closing(urlopen(url)) as response:
             location_data = json.loads(response.read())
@@ -175,10 +180,15 @@ def get_random_location():
     """
     location_dict= get_location(get_random_ip())
     print(location_dict)
-    if str(location_dict['region_name'])== '':
-        location_dict['region_name']=location_dict['country_name']
+    #CAPS
+    #if str(location_dict['region_name'])== '':
+    #    location_dict['region_name']=location_dict['country_name']
+    location_dict['region_name']=location_dict['country']['name']
 
-    location= Location(location_name=str(location_dict['region_name']),location_lat=location_dict['latitude'],location_long=location_dict['longitude'])
+    location= Location(location_name=str(location_dict['region_name']),location_lat=location_dict['location']['latitude'],location_long=location_dict['location']['longitude'])
+
+    #CAPS
+    #location= Location(location_name=str(location_dict['region_name']),location_lat=location_dict['latitude'],location_long=location_dict['longitude'])
     location.save()
     return location
 
@@ -497,56 +507,21 @@ def newsfeed(request):
 
     """
     context = RequestContext(request)
-    #req_loc=get_random_location()
-    #print('The request location data is')
-    #print('Location name ',req_loc.location_name,' longitude ',req_loc.location_long,' latitude ',req_loc.location_lat,' ')
-    #minlat=(req_loc.location_lat)-10.00
-    #maxlat=(req_loc.location_lat)+10.00
-    #minlong=(req_loc.location_long)-10.00
-    #maxlong=(req_loc.location_long)+10.00
-
 
     user_profile = request.user.userprofile
     if user_profile.verification_status == 'p':
         return HttpResponseRedirect(reverse('verification'))
     else:
-        #remote host part
-        req_loc_dict=get_location(get_ip_address(request))
-        if str(req_loc_dict['region_name'])== '':
-            req_loc_dict['region_name']=req_loc_dict['country_name']
-
-        req_loc= Location(location_name=str(req_loc_dict['region_name']),location_lat=req_loc_dict['latitude'],location_long=req_loc_dict['longitude'])
-        proximity_range=get_proximity_range(req_loc_dict,10,10)
-        minlat=proximity_range['min_lat']
-        maxlat=proximity_range['max_lat']
-        minlong=proximity_range['min_long']
-        maxlong=proximity_range['max_long']
-        place=req_loc.location_name
-        place_lat=req_loc.location_lat
-        place_long=req_loc.location_long
-        print('minlat ',minlat,'maxlat',maxlat,'minlong',minlong,'maxlong ',maxlong)
         posts=Post.objects.all()
         allblocklist=[]
         allblocklist=find_blocks(request)
-        #loc_range=is_near(req_loc.location_lat,req_loc.location_long)
-        #print(loc_range)
-        #posts=Post.objects.filter(post_location__location_lat__lte=loc_range[0],post_location__location_lat__gte=loc_range[1],post_location__location_long__lte=loc_range[2],post_location__location_long__gte=loc_range[3]).exclude(Q(post_maker__in=allblocklist))
-        #|Q(post_location__location_lat__lt= req_loc.location_lat,post_location__location_long__lt= req_loc.location_long))
-        #posts=Post.objects.exclude(Q(post_maker__in=allblocklist))
-    #    posts=Post.objects.filter(post_location__location_lat__lte=req_loc.location_lat, post_location__location_long__lte=req_loc.location_long).exclude(Q(post_maker__in=allblocklist))
-        posts=Post.objects.filter(post_location__location_lat__lte=maxlat,post_location__location_lat__gte=minlat, post_location__location_long__lte=maxlong,post_location__location_long__gte=minlong).exclude(Q(post_maker__in=allblocklist))
 
         if request.POST:
-         #   print(request.POST.get('status'))
-            #get random location
-            req_loc.save()
 
-            post_location=req_loc
-            #print(post_location.location_name)
             post_maker=UserProfile.objects.get(user=request.user)
             post_text=request.POST.get('status')
             post_time=datetime.now()
-            post=Post(post_maker=post_maker,post_text=post_text,post_time=post_time,post_sharecount=0,post_location=post_location)
+            post=Post(post_maker=post_maker,post_text=post_text,post_time=post_time,post_sharecount=0)
             if request.FILES.get('post_photo'):
                 uploaded_file = request.FILES.get('post_photo')
           #      print(uploaded_file.name)
@@ -558,7 +533,7 @@ def newsfeed(request):
 
             post.save()
 
-        return render_to_response('newsfeed.html', {'posts':posts,'place':place,'place_lat':place_lat,'place_long':place_long}, context)
+        return render_to_response('newsfeed.html', {'posts':posts,'place':"Dhaka",'place_lat':123.45,'place_long':123.45}, context)
 
 
 # Use the login_required() decorator to ensure only those logged in can access the view.
@@ -597,15 +572,7 @@ def spread(request,post_id):
         spreadedpost.post_sharecount+=1
         spreadedpost.save()
 
-        req_loc_dict=get_location(get_ip_address(request))
-        if str(req_loc_dict['region_name'])== '':
-            req_loc_dict['region_name']=req_loc_dict['country_name']
-
-        req_loc= Location(location_name=str(req_loc_dict['region_name']),location_lat=req_loc_dict['latitude'],location_long=req_loc_dict['longitude'])
-        req_loc.save()
         newpost=Post()
-        newpost.post_location=req_loc
-        print(newpost.post_location.location_name)
         newpost.post_maker=UserProfile.objects.get(user=request.user)
         newpost.post_text=spreadedpost.post_text
         newpost.post_photo=spreadedpost.post_photo
@@ -775,7 +742,7 @@ def verification(request):
 
 @login_required(login_url='/carpool/')
 def change_password(request):
-    """
+    """//////////////////
     Shows the change password form or changes the password based on request method
     :param request: The HTMLRequest
     :return: if the user is not logged in,redirects to index page

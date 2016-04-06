@@ -27,7 +27,3 @@ GRANT ALL PRIVILEGES ON *.* TO hackathonfnfuser@localhost;
 FLUSH PRIVILEGES;
 exit;
 
-
-10- makemigrate migrate syncdb
-11-whole database import from testsharethis
-12-
