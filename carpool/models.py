@@ -79,7 +79,7 @@ class Trip(models.Model):
     """
     Model referring to the different trips of the users.
     """
-
+    created_by=models.ForeignKey(UserProfile,related_name='userprofile')
     source=models.ForeignKey(Location,related_name="source")
     destination=models.ForeignKey(Location,related_name="destination")
     driver_of_trip=models.ForeignKey(Driver)
@@ -94,6 +94,15 @@ class TripRequest(models.Model):
 
     user_requested=models.ForeignKey(UserProfile)
     trip_requested=models.ForeignKey(Trip)
+    trip_status_choices = (
+        ('a', 'approved'),
+        ('d', 'disapproved'),
+        ('o', 'other'),
+        ('p', 'pending'),
+        ('s', 'suspended')
+    )
+    trip_status = models.CharField(blank=False, max_length=2, choices=trip_status_choices, default='p')
+
 
 class Ride(models.Model):
     """

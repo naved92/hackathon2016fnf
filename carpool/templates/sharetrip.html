@@ -30,23 +30,21 @@
 
                                     <div class="form-group">
                                         <input type="text" name="destination" id="destination" tabindex="2"
-                                               class="form-control" placeholder="destination">
+                                               class="form-control" placeholder="Destination">
                                     </div>
 
 
-            <div class="form-group">
-                <div class='input-group date' id='datetimepicker1' name="trip_time">
-                    <input type='text' class="form-control" />
-                    <span class="input-group-addon">
-                        <span class="glyphicon glyphicon-calendar"></span>
-                    </span>
-        <script type="text/javascript">
-            $(function () {
-                $('#datetimepicker1').datetimepicker();
-            });
-        </script>
-    </div>
-</div>
+            <div class="form-group" id="date-div">
+                <input type="text" name="trip_time" id='trip_time'
+                       value="" class="form-control" placeholder="Trip time (10-Mar-2016 9:00AM) ">
+                <script type="text/javascript">
+                    $(function(){
+                        $('#trip_time').dtpicker();
+                    });
+                </script>
+            </div>
+
+
 
      <div class="form-group">
   <label for="cars">Select your car to share:</label>
@@ -79,51 +77,6 @@
     <hr>
     </div>
 
-    <div class="container">
-        <div class="col-md-4">
-
-        </div>
-        <div class="col-md-4">
-                Cars owned by {{ request.user.username }}
-
-        </div>
-
-
-
-    </div>
-
-
-    <div class="container">
-  <h2>Cars list</h2>
-  <div class="table-responsive">
-  <table class="table">
-    <thead>
-      <tr>
-        <th>Registration number</th>
-        <th>Model</th>
-        <th>Number of seats</th>
-
-      </tr>
-    </thead>
-    <tbody>
-
-    {% for car in cars %}
-
-      <tr>
-
-        <td>      {{ car.registration_number }}
-          </td>
-        <td>      {{ car.car_model }}
-          </td>
-        <td>      {{ car.number_of_seats }}
-          </td>
-      </tr>
-
-    {%  endfor %}
-        </tbody>
-  </table>
-  </div>
-</div>
 
 
 

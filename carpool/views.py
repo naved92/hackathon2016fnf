@@ -19,6 +19,7 @@ from urllib2 import urlopen
 from contextlib import closing
 from ipware.ip import get_ip
 
+import googlemaps
 import cgi
 import json
 import math
@@ -26,7 +27,7 @@ import sys
 import requests
 
 from .forms import VerificationForm, PasswordChangeForm
-from carpool.models import User, UserProfile, Post,Profileposts,Block,Location,Car,Trip
+from carpool.models import User, UserProfile, Post,Profileposts,Block,Location,Car,Trip,TripRequest
 from carpool.forms import RegistrationForm,UpdateProfileForm
 
 # utility functions
@@ -626,7 +627,9 @@ def sharetrip(request):
     if user_profile.verification_status == 'p':
         return HttpResponseRedirect(reverse('verification'))
     elif request.POST:
-
+        gmaps = googlemaps.Client('AIzaSyAiKxi8N4kjDo04LyVHuUJ1fWlvjojbrLk')
+        source_lat,source_long = gmaps.geocode(request.POST.get('source'))
+        dest_lat, dest_long = gmaps.geocode(request.POST.get('destination'))
         source_location=Location(location_name="Dhaka",location_lat="24.019",location_long="90.4180")
         source_location.save()
 
@@ -891,3 +894,55 @@ def change_password(request):
         return render(request, 'change_password.html', {'form': change_password_form,
                                                         'user_profile': requesting_user_profile,
                                                         'error': error})
+
+
+@login_required(login_url='/carpool/')
+def requestatrip(request):
+
+    """
+    Gives the user an opportunity to request for a trip
+    :param request:The HTMLRequest
+    :return:  if the user is not logged in,it redirects to the index page
+              else if the user is not verified,it redirects to 'verification.html'
+              else the user gives input of the request for which search result is shown
+
+    """
+    context = RequestContext(request)
+    user_profile = request.user.userprofile
+    if user_profile.verification_status == 'p':
+        return HttpResponseRedirect(reverse('verification'))
+    elif request.POST:
+        source = request.POST.get('source')
+        destination = request.POST.get('destination')
+        trip_time = request.POST.get('trip_time')
+        available_trips = Trip.objects.filter(source=source, destination=destination,trip_time=trip_time)
+
+        return render_to_response('requestatrip.html', {'available_trips':available_trips}, context)
+    else:
+        return render_to_response('requestatrip.html',context)
+
+
+
+@login_required(login_url='/carpool/')
+def pendingrequests(request):
+
+    """
+    Gives the user to view both his pending outgoing and incoming requests
+    :param request:The HTMLRequest
+    :return:  if the user is not logged in,it redirects to the index page
+              else if the user is not verified,it redirects to 'verification.html'
+              else the user gives input of the request for which search result is shown
+
+    """
+    context = RequestContext(request)
+    user_profile = request.user.userprofile
+    if user_profile.verification_status == 'p':
+        return HttpResponseRedirect(reverse('verification'))
+    else:
+        user = request.user.userprofile
+        outgoing_requests = TripRequest.objects.filter(user_requested=user)
+        outgoing_trips = Trip.objects.filter(id=outgoing_requests)
+
+        all_trips_created_by_user = Trip.objects.filter(created_by=user)
+        incoming_requests = TripRequest.objects.filter(trip_requested=all_trips_created_by_user,trip_status="P")
+        return render_to_response('pendingrequests.html',{'incoming':incoming_requests, 'outgoing':outgoing_trips},context)

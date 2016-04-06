@@ -18,6 +18,8 @@
     <link href="{% static 'css/round-about.css' %}" rel="stylesheet">
     <link href="{% static 'css/statusupdate.css' %}" rel="stylesheet">
     <link href="{% static 'css/jasny-bootstrap.css' %}" rel="stylesheet">
+    <link type="text/css" href="{% static 'css/jquery.simple-dtpicker.css' %}" rel="stylesheet" />
+
 
 
     <!--[if lt IE 9]>
@@ -79,9 +81,9 @@
                         <li><a href="{% url 'aboutus' %}">About Us</a></li>
                         <li><a href="{% url 'profile' user.id %}">My profile</a></li>
                         <li><a href="{% url 'cars' %}">Cars</a></li>
-                        <li><a>Trip Request</a></li>
+                        <li><a href="{% url 'requestatrip' %}"> Request a Trip</a></li>
                         <li><a href="{% url 'sharetrip' %}">Share trip</a></li>
-                        <li><a>Pending Requests</a></li>
+                        <li><a href="{% url 'pendingrequests' %}">Pending Requests</a></li>
                         <li><a>Previous Trips</a></li>
                         <li><a href="{% url 'updateinfo' %}">Update Info</a></li>
                         <li><a href="{% url 'logout' %}">Logout</a></li>
@@ -179,6 +181,8 @@
     <script type="text/javascript" src="{% static 'js/main.js' %}"></script>
     <script type="text/javascript" src="{% static 'js/logreg.js' %}"></script>
     <script type="text/javascript" src="{% static 'js/jasney-bootstrap.js' %}"></script>
+	<script type="text/javascript" src="{% static 'js/jquery.simple-dtpicker.js' %}"></script>
+
 
 </body>
 </html>

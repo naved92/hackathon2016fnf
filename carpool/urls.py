@@ -20,5 +20,6 @@ urlpatterns = [
         url(r'^change_password/$',views.change_password, name='change_password'),
         url(r'^cars/$', views.cars,name='cars'),
         url(r'^sharetrip/$', views.sharetrip,name='sharetrip'),
-
+        url(r'^requestatrip/$',views.requestatrip,name='requestatrip'),
+        url(r'^pendingrequests/$', views.pendingrequests,name='pendingrequests')
         ]
