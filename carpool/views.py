@@ -342,6 +342,7 @@ def profile(request,user_id):
             #print("yes")
             blocks=Block.objects.filter(blocker=username)
         #print(blocks)
+        #return render_to_response('dragoon - Codeforces.html',{},context)
         return render_to_response('profile.html', {'posts':profilepostlist,'label':toplabel,'userprofile':username,'blocks':blocks}, context)
 
 @login_required(login_url='/sharecar/')
@@ -699,7 +700,7 @@ def spread(request,post_id):
         newpost.save()
         return HttpResponseRedirect(reverse('newsfeed'))
 
-<<<<<<< HEAD
+
 @login_required(login_url='/carpool/')
 def previoustrips(request):
     """
@@ -727,10 +728,7 @@ def previoustrips(request):
 
         return render_to_response('previoustrips.html', {'pretripsshared':pretripsshared,'pretripsoffered':pretripsoffered,'user_profile':user_profile}, context)
 
-@login_required(login_url='/carpool/')
-=======
 @login_required(login_url='/sharecar/')
->>>>>>> 660b53cc1521916902fde2b652dbe7020993ca45
 def post(request,post_id):
 
     """
