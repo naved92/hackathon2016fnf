@@ -50,7 +50,7 @@
             </div>
         </form>
         </div>
-s</div>
+</div>
 
 
 
@@ -73,7 +73,7 @@ s</div>
                         <th>Time</th>
                         <th>Car Number</th>
                         <th>Car Owner</th>
-                        <th></th>
+                        <th>Action</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -98,7 +98,7 @@ s</div>
                             {{ trips.created_by.user.username }} </a>
                         </td>
                         <td>
-
+                            <a href={% url 'triprequest' %}>request</a>
                         </td>
                     </tr>
             {%  endfor %}

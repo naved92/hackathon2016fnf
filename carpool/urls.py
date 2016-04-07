@@ -22,4 +22,5 @@ urlpatterns = [
         url(r'^sharetrip/$', views.sharetrip,name='sharetrip'),
         url(r'^requestatrip/$',views.requestatrip,name='requestatrip'),
         url(r'^pendingrequests/$', views.pendingrequests,name='pendingrequests')
+
         ]

@@ -946,6 +946,28 @@ def requestatrip(request):
         return render_to_response('requestatrip.html',context)
 
 
+@login_required(login_url='/sharecar')
+def triprequest(request,tripid):
+    """
+    the rider requests to ride in a trip that was shared by someone else
+    :param request: request
+    :param trip id: that he/she wants to join
+    :return: Unblocks the user id
+
+    """
+    context = RequestContext(request)
+    user_profile = request.user.userprofile
+    if user_profile.verification_status == 'p':
+        return HttpResponseRedirect(reverse('verification'))
+    else:
+        who_blocked=UserProfile.objects.get(user=request.user)
+        who_got_blocked=UserProfile.objects.get(user=User.objects.get(id=user_id))
+
+        blockrecord= Block.objects.filter(blocker=who_blocked,blocked=who_got_blocked)
+        blockrecord.delete()
+        return HttpResponseRedirect(reverse('profile',kwargs={'user_id':request.user.id}))
+
+
 
 @login_required(login_url='/sharecar/')
 def pendingrequests(request):
