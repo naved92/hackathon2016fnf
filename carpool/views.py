@@ -968,5 +968,5 @@ def pendingrequests(request):
         outgoing_trips = Trip.objects.filter(id=outgoing_requests)
 
         all_trips_created_by_user = Trip.objects.filter(created_by=user)
-        incoming_requests = TripRequest.objects.filter(trip_requested=all_trips_created_by_user,trip_status="P")
+        incoming_requests = TripRequest.objects.filter(trip_requested=all_trips_created_by_user,trip_status="p")
         return render_to_response('pendingrequests.html',{'incoming':incoming_requests, 'outgoing':outgoing_trips},context)

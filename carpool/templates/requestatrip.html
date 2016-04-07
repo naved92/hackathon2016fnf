@@ -15,7 +15,7 @@
 
 
         </div>
-        <div class="col-md-4">
+    <div class="col-md-4">
             <form id="requestatrip-form" action="{% url 'requestatrip' %}" method="post" role="form"
                     style="display: block;"> {% csrf_token %}
             {% csrf_token %}
@@ -50,8 +50,8 @@
             </div>
         </form>
         </div>
-    </div>
-</div>
+s</div>
+
 
 
 <div>
@@ -60,46 +60,59 @@
 </div>
 {% if available_trips %}
 <div class="container">
+    <div class="col-md-1">
+
+    </div>
+    <div class="col-md-10">
         <div class="table-responsive">
-        <table class="table">
-            <thead>
-                <tr>
-                    <th>Source</th>
-                    <th>Destination</th>
-                    <th>Time</th>
-                    <th>Car Number</th>
-                    <th>Car Owner</th>
-                </tr>
-            </thead>
-        <tbody>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Source</th>
+                        <th>Destination</th>
+                        <th>Time</th>
+                        <th>Car Number</th>
+                        <th>Car Owner</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
 
-        {% for trips in available_trips %}
+            {% for trips in available_trips %}
 
-                <tr>
-                    <td>
-                        {{ trips.source.location_name }}
-                    </td>
-                    <td>
-                        {{ trips.destination.location_name }}
-                    </td>
-                    <td>
-                        {{ trips.trip_time }}
-                    </td>
-                    <td>
-                        {{ trips.car_of_trip.registration_number }}
-                    </td>
-                    <td>
-                        {{ trips.created_by.userprofile.username }}
-                    </td>
-                </tr>
-        {%  endfor %}
-</tbody>
-</table>
-</div>
-</div>
+                    <tr>
+                        <td>
+                            {{ trips.source.location_name }}
+                        </td>
+                        <td>
+                            {{ trips.destination.location_name }}
+                        </td>
+                        <td>
+                            {{ trips.trip_time }}
+                        </td>
+                        <td>
+                            {{ trips.car_of_trip.registration_number }}
+                        </td>
+                        <td>
+                            <a href='{% url 'profile' trips.created_by.user.id %}' >
+                            {{ trips.created_by.user.username }} </a>
+                        </td>
+                        <td>
+
+                        </td>
+                    </tr>
+            {%  endfor %}
+    </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="col-md-1">
+
+    </div>
 {% endif %}
 
 
 
 {% endblock %}
 
+</div>
