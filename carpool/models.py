@@ -85,6 +85,15 @@ class Trip(models.Model):
     driver_of_trip=models.ForeignKey(Driver)
     trip_time=models.DateTimeField(blank=True)
     car_of_trip=models.ForeignKey(Car)
+    trip_status_choices = (
+        ('a', 'approved'),
+        ('d', 'disapproved'),
+        ('o', 'other'),
+        ('p', 'pending'),
+        ('s', 'suspended'),
+        ('c','completed'),
+    )
+    trip_status = models.CharField(blank=False, max_length=2, choices=trip_status_choices, default='p')
 
 class TripRequest(models.Model):
 
@@ -101,6 +110,7 @@ class TripRequest(models.Model):
         ('p', 'pending'),
         ('s', 'suspended')
     )
+    requested_time=models.DateTimeField(blank=True)
     trip_status = models.CharField(blank=False, max_length=2, choices=trip_status_choices, default='p')
 
 
