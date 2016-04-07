@@ -1,0 +1,107 @@
+{% extends 'base.html' %}
+{% load staticfiles %}
+<!DOCTYPE html>
+{% block title %}Your trip history{% endblock %}
+{% block body_block %}
+            <div>
+
+            <h3>Trips shared by {{ user_profile.user.username }}</h3>
+            </div>
+            <div class="container">
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Source</th>
+                                <th>Destination</th>
+                                <th>Time</th>
+                                <th>Car Number</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+
+                        {% for trips in pretripsshared %}
+
+                        <tr>
+                            <td>
+                                {{ trips.source }}
+                            </td>
+                            <td>
+                                {{ trips.destination }}
+                            </td>
+                            <td>
+                                {{ trips.trip_time }}
+                            </td>
+                            <td>
+                                {{ trips.car_of_trip }}
+                            </td>
+
+                            <td>
+                                <a href="#"><strong>Rate now!!!</strong></a>
+                            </td>
+                        </tr>
+                        {%  endfor %}
+                    </tbody>
+                </table>
+            </div>
+    <div class="col-md-12">
+    <hr>
+    <hr>
+    </div>
+</div>
+    <div>
+
+            <h3>Trips offered by {{ request.user.username }}</h3>
+            </div>
+
+    <div class="container">
+        <div class="table-responsive">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Source</th>
+                    <th>Destination</th>
+                    <th>Time</th>
+                    <th>Car Number</th>
+                    <th></th>
+                </tr>
+            </thead>
+        <tbody>
+
+        {% for trips in pretripsoffered %}
+
+                <tr>
+                    <td>
+                        {{ trips.source }}
+                    </td>
+                    <td>
+                        {{ trips.destination }}
+                    </td>
+                    <td>
+                        {{ trips.trip_time }}
+                    </td>
+                    <td>
+                        {{ trips.car_of_trip }}
+                    </td>
+                     <td>
+                         <a href="#"><strong>Rate now!!!</strong></a>
+                     </td>
+
+                </tr>
+        {%  endfor %}
+</tbody>
+</table>
+</div>
+</div>
+
+<div>
+    <hr>
+    <hr>
+</div>
+
+
+
+
+{% endblock %}
+

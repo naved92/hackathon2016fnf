@@ -21,6 +21,7 @@ urlpatterns = [
         url(r'^cars/$', views.cars,name='cars'),
         url(r'^sharetrip/$', views.sharetrip,name='sharetrip'),
         url(r'^requestatrip/$',views.requestatrip,name='requestatrip'),
-        url(r'^pendingrequests/$', views.pendingrequests,name='pendingrequests')
+        url(r'^pendingrequests/$', views.pendingrequests,name='pendingrequests'),
+        url(r'^previoustrips/$', views.previoustrips,name='previoustrips'),
 
         ]

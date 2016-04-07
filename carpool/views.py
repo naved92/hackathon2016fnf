@@ -699,7 +699,38 @@ def spread(request,post_id):
         newpost.save()
         return HttpResponseRedirect(reverse('newsfeed'))
 
+<<<<<<< HEAD
+@login_required(login_url='/carpool/')
+def previoustrips(request):
+    """
+    Shows the previous trip of a user
+    :param request:The HTMLRequest
+    :param
+    :return:  if the user is not logged in,it redirects to the index page
+             else if the user is not verified,it redirects to 'verification.html'
+             else if the requesting user is blocked by the requested user or has blocked requested user,an error page is shown
+            else sshows the previous trips redirects to newsfeed page
+
+    """
+    context = RequestContext(request)
+    user_profile = request.user.userprofile
+    print(user_profile.user.username)
+    if user_profile.verification_status == 'p':
+        return HttpResponseRedirect(reverse('verification'))
+    else:
+        temp_user= UserProfile.objects.get(user=request.user)
+
+        nowtime=datetime.now()
+
+        pretripsshared=TripRequest.objects.filter(user_requested=temp_user ,trip_status="a",requested_time__lt=nowtime)
+        pretripsoffered=Trip.objects.filter(created_by=temp_user , trip_status="c" ,trip_time__lt=nowtime)
+
+        return render_to_response('previoustrips.html', {'pretripsshared':pretripsshared,'pretripsoffered':pretripsoffered,'user_profile':user_profile}, context)
+
+@login_required(login_url='/carpool/')
+=======
 @login_required(login_url='/sharecar/')
+>>>>>>> 660b53cc1521916902fde2b652dbe7020993ca45
 def post(request,post_id):
 
     """
