@@ -68,7 +68,7 @@
                     <th>Destination</th>
                     <th>Time</th>
                     <th>Car Number</th>
-
+                    <th>Car Owner</th>
                 </tr>
             </thead>
         <tbody>
@@ -87,6 +87,9 @@
                     </td>
                     <td>
                         {{ trips.car_of_trip.registration_number }}
+                    </td>
+                    <td>
+                        {{ trips.created_by.userprofile.username }}
                     </td>
                 </tr>
         {%  endfor %}
