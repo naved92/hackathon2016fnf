@@ -10,71 +10,57 @@
 
 <div class="panel-body">
 
-    <div class="row">
-        <div class="col-md-4">
+<div class="row">
+    <div class="col-md-4">
+    </div>
+    <div class="col-md-4">
 
+        <form id="sharetrip-form" action="{% url 'sharetrip' %}" method="post" role="form"
+                                      style="display: block;">
+            {% csrf_token %}
+            {% csrf_token %}
+            <input type="hidden" name="next" value="{{ request.GET.next }}"/>
+                <div class="form-group">
+                    <input type="text" name="source" id="source" tabindex="1" class="form-control" placeholder="Source" value="">
+                </div>
+                <div class="form-group">
+                    <input type="text" name="destination" id="destination" tabindex="2" class="form-control" placeholder="Destination">
+                </div>
 
-        </div>
-                        <div class="col-md-4">
-    <form id="sharetrip-form" action="{% url 'sharetrip' %}" method="post" role="form"
-                                      style="display: block;"> {% csrf_token %}
-                                    {% csrf_token %}
+                <div class="form-group" >
+                    <input type="date" name="date_of_trip"class="form-control">
+                </div>
 
+                <div class="form-group">
+                    <input type="time" name="time_of_trip" class="form-control">
+                </div>
 
-                                    <input type="hidden" name="next" value="{{ request.GET.next }}"/>
-
-                                    <div class="form-group">
-                                        <input type="text" name="source" id="source" tabindex="1"
-                                               class="form-control" placeholder="Source" value="">
-                                    </div>
-
-                                    <div class="form-group">
-                                        <input type="text" name="destination" id="destination" tabindex="2"
-                                               class="form-control" placeholder="Destination">
-                                    </div>
-
-
-            <div class="form-group" id="date-div">
-                <input type="text" name="trip_time" id='trip_time'
-                       value="" class="form-control" placeholder="Trip time (10-Mar-2016 9:00AM) ">
-                <script type="text/javascript">
-                    $(function(){
-                        $('#trip_time').dtpicker();
-                    });
-                </script>
+            <div class="form-group">
+            <label for="cars">Select your car to share:</label>
+                <select class="form-control" id="car" name="car">
+                {% for car in cars %}
+                    <option>{{ car.registration_number }}</option>
+                {% endfor %}
+                </select>
             </div>
 
-
-
-     <div class="form-group">
-  <label for="cars">Select your car to share:</label>
-  <select class="form-control" id="car" name="car">
-    {% for car in cars %}
-
-    <option>{{ car.registration_number }}</option>
-    {% endfor %}
-     </select>
+            <div class="form-group">
+                <div class="row">
+                    <div class="col-sm-6 col-sm-offset-3">
+                        <input type="submit" name="sharecar-submit" id="sharecar-submit"
+                               tabindex="4" class="form-control btn btn-register"
+                               value="Share Trip">
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
 </div>
+</div>
+    <div>
 
-                                    <div class="form-group">
-                                        <div class="row">
-                                            <div class="col-sm-6 col-sm-offset-3">
-                                                <input type="submit" name="sharecar-submit" id="sharecaR-submit"
-                                                       tabindex="4" class="form-control btn btn-register"
-                                                       value="Share Trip">
-                                            </div>
-                                        </div>
-                                    </div>
-                                </form>
-                        </div>
-    </div>
-    </div>
-
-
-           <div>
-
-    <hr>
-    <hr>
+        <hr>
+        <hr>
     </div>
 
 

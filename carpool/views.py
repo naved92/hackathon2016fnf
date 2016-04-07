@@ -1,5 +1,3 @@
-
-
 from django.template import RequestContext
 from django.shortcuts import render_to_response, render
 from django.contrib.auth import authenticate, login, logout
@@ -12,20 +10,22 @@ from django.views.decorators.csrf import csrf_protect
 from django.core.urlresolvers import reverse
 from django.db.models import Q
 
-from datetime import datetime
+from datetime import datetime,timedelta
 from string import join,split
 from random import randint
 from urllib2 import urlopen
 from contextlib import closing
 from ipware.ip import get_ip
 
-import googlemaps
+
+import geocoder
 import cgi
 import json
 import math
 import sys
 import requests
 
+from datetime import datetime,time, date
 from .forms import VerificationForm, PasswordChangeForm
 from carpool.models import User, UserProfile, Post,Profileposts,Block,Location,Car,Trip,TripRequest
 from carpool.forms import RegistrationForm,UpdateProfileForm
@@ -240,7 +240,7 @@ def aboutus(request):
     return render_to_response('aboutus.html', {}, context)
 
 
-@login_required(login_url='/carpool/')
+@login_required(login_url='/sharecar/')
 def updateinfo(request):
     """
     A page containing the update info form
@@ -279,7 +279,7 @@ def updateinfo(request):
         return render_to_response('updateinfo.html', {}, context)
 
 
-@login_required(login_url='/carpool/')
+@login_required(login_url='/sharecar/')
 def profile(request,user_id):
     """
     A page showing the profile of the requested user id
@@ -344,7 +344,7 @@ def profile(request,user_id):
         #print(blocks)
         return render_to_response('profile.html', {'posts':profilepostlist,'label':toplabel,'userprofile':username,'blocks':blocks}, context)
 
-@login_required(login_url='/carpool/')
+@login_required(login_url='/sharecar/')
 def profile_by_name(request,user_name):
     """
     A page showing the profile of the requested user
@@ -457,10 +457,10 @@ def register(request):
             user = authenticate(username=form.cleaned_data['username'], password=form.cleaned_data['password1'])
             login(request, user)
             #print(request.POST.get('next'))
-            return redirect('/carpool/newsfeed/')
+            return redirect('/sharecar/newsfeed/')
         else:
             error = {'has_error':True, 'message':'invalid input'}
-            return HttpResponseRedirect('/carpool/',{'error':error})
+            return HttpResponseRedirect('/sharecar/',{'error':error})
 
     else:
         form = RegistrationForm()
@@ -494,13 +494,13 @@ def user_login(request):
             if user.is_active:
                 login(request, user)
                 if (request.POST.get('next') == ''):
-                    return redirect('/carpool/newsfeed/')
+                    return redirect('/sharecar/newsfeed/')
                 return redirect(request.POST.get('next'))
         error = {'has_error':True,'message':'Username Password do not match'}
         return render_to_response('index.html', {'error': error}, context_instance=RequestContext(request))
 
 
-@login_required(login_url='/carpool/')
+@login_required(login_url='/sharecar/')
 def newsfeed(request):
     """
     The newsfeed renderer
@@ -543,7 +543,7 @@ def newsfeed(request):
 
 # Use the login_required() decorator to ensure only those logged in can access the view.
 
-@login_required(login_url='/carpool/')
+@login_required(login_url='/sharecar/')
 def user_logout(request):
     """
     Destroys the session
@@ -554,9 +554,9 @@ def user_logout(request):
     logout(request)
 
     # Take the user back to the homepage.
-    return HttpResponseRedirect('/carpool/')
+    return HttpResponseRedirect('/sharecar/')
 
-@login_required(login_url='/carpool/')
+@login_required(login_url='/sharecar/')
 def cars(request):
 
     """
@@ -610,7 +610,7 @@ def cars(request):
 
 
 
-@login_required(login_url='/carpool/')
+@login_required(login_url='/sharecar/')
 def sharetrip(request):
     """
     Shares the trip of a user
@@ -627,22 +627,37 @@ def sharetrip(request):
     if user_profile.verification_status == 'p':
         return HttpResponseRedirect(reverse('verification'))
     elif request.POST:
-        gmaps = googlemaps.Client('AIzaSyAiKxi8N4kjDo04LyVHuUJ1fWlvjojbrLk')
-        source_lat,source_long = gmaps.geocode(request.POST.get('source'))
-        dest_lat, dest_long = gmaps.geocode(request.POST.get('destination'))
-        source_location=Location(location_name="Dhaka",location_lat="24.019",location_long="90.4180")
-        source_location.save()
 
-        destination_location=Location(location_name="Dhaka",location_lat="24.019",location_long="90.4180")
-        destination_location.save()
+        searchLoc = Location.objects.get(location_name=request.POST.get('source'))
+        if searchLoc:
+            source_location = searchLoc
+        else:
+            source_lat,source_long = geocoder.google(request.POST.get('source')).latlng
+            new_location = Location(location_name=request.POST.get('source'),location_lat=source_lat,location_long=source_long)
+            new_location.save()
+            source_location = new_location
+        searchLoc = Location.objects.get(location_name=request.POST.get('destination'))
+        if searchLoc:
+            destination_location = searchLoc
+        else:
+            dest_lat, dest_long = geocoder.google(request.POST.get('destination')).latlng
+            new_location = Location(location_name=request.POST.get('destination'),location_long=dest_long,location_lat=dest_lat)
+            new_location.save()
+            destination_location = new_location
+        print request.POST.get('date_of_trip')
+        print request.POST.get('time_of_trip')
+        trip_date = datetime.strptime(request.POST.get('date_of_trip'),'%Y-%m-%d')
+        trip_time = datetime.time(datetime.strptime(request.POST.get('time_of_trip'),'%H:%M'))
+        trip_date_time = datetime.combine(trip_date,trip_time)
 
-        trip_time=request.POST.get('trip_time')
         car_reg=request.POST.get('car')
         trip_car=Car.objects.get(registration_number=car_reg)
 
-        newTripOffer=Trip(source=source_location,destination=destination_location,trip_time=trip_time,car_of_trip=trip_car)
+        newTripOffer=Trip(source=source_location,destination=destination_location,
+                          trip_time=trip_date_time,car_of_trip=trip_car,
+                          created_by_id=user_profile.id
+                          )
         newTripOffer.save()
-
 
         return HttpResponseRedirect(reverse('sharetrip'))
     else:
@@ -652,7 +667,7 @@ def sharetrip(request):
 
         return render_to_response('sharetrip.html', {'cars':cars}, context_instance=RequestContext(request))
 
-@login_required(login_url='/carpool/')
+@login_required(login_url='/sharecar/')
 def spread(request,post_id):
     """
     Spreads the post of a user within the range
@@ -684,7 +699,7 @@ def spread(request,post_id):
         newpost.save()
         return HttpResponseRedirect(reverse('newsfeed'))
 
-@login_required(login_url='/carpool/')
+@login_required(login_url='/sharecar/')
 def post(request,post_id):
 
     """
@@ -713,7 +728,7 @@ def post(request,post_id):
         return render_to_response('post.html', {'post':post}, context)
 
 
-@login_required(login_url='/carpool/')
+@login_required(login_url='/sharecar/')
 def block(request,user_id):
     """
     Blocks the requested user id
@@ -733,7 +748,7 @@ def block(request,user_id):
         block.save()
         return HttpResponseRedirect(reverse('profile',kwargs={'user_id':request.user.id}))
 
-@login_required(login_url='/carpool/')
+@login_required(login_url='/sharecar/')
 def unblock(request,user_id):
     """
     Unblocks the requested user id
@@ -754,7 +769,7 @@ def unblock(request,user_id):
         blockrecord.delete()
         return HttpResponseRedirect(reverse('profile',kwargs={'user_id':request.user.id}))
 
-@login_required(login_url='/carpool/')
+@login_required(login_url='/sharecar/')
 def find_blocks(request):
     """
     returns the blocklist of user along with the list of people who blocked the user
@@ -806,7 +821,7 @@ def nopermission(request):
 
 
 
-@login_required(login_url='/carpool/')
+@login_required(login_url='/sharecar/')
 def verification(request):
     requesting_user_profile = request.user.userprofile
     if request.method == 'POST':
@@ -841,7 +856,7 @@ def verification(request):
                                                      'error': error})
 
 
-@login_required(login_url='/carpool/')
+@login_required(login_url='/sharecar/')
 def change_password(request):
     """//////////////////
     Shows the change password form or changes the password based on request method
@@ -896,7 +911,7 @@ def change_password(request):
                                                         'error': error})
 
 
-@login_required(login_url='/carpool/')
+@login_required(login_url='/sharecar/')
 def requestatrip(request):
 
     """
@@ -912,18 +927,27 @@ def requestatrip(request):
     if user_profile.verification_status == 'p':
         return HttpResponseRedirect(reverse('verification'))
     elif request.POST:
-        source = request.POST.get('source')
-        destination = request.POST.get('destination')
-        trip_time = request.POST.get('trip_time')
-        available_trips = Trip.objects.filter(source=source, destination=destination,trip_time=trip_time)
+        source_loc= Location.objects.get(location_name=request.POST.get('source'))
+        destination_loc = Location.objects.get(location_name=request.POST.get('destination'))
 
-        return render_to_response('requestatrip.html', {'available_trips':available_trips}, context)
+        trip_date = datetime.strptime(request.POST.get('date_of_trip'),'%Y-%m-%d')
+        trip_time = datetime.time(datetime.strptime(request.POST.get('time_of_trip'),'%H:%M'))
+        trip_date_time = datetime.combine(trip_date,trip_time)
+        end_trip_time = trip_date_time + timedelta(hours=1)
+        available_trips = Trip.objects.filter(source=source_loc, destination=destination_loc,
+                                              trip_time__range=[trip_date_time,end_trip_time])
+
+        if (available_trips):
+            return render_to_response('requestatrip.html', {'available_trips':available_trips}, context)
+        else:
+            no_trip_found = []
+            return render_to_response('requestatrip.html',{'no_trips':no_trip_found},context)
     else:
         return render_to_response('requestatrip.html',context)
 
 
 
-@login_required(login_url='/carpool/')
+@login_required(login_url='/sharecar/')
 def pendingrequests(request):
 
     """

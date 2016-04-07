@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% load staticfiles %}
 <!DOCTYPE html>
-{% block title %}Share your trip{% endblock %}
+{% block title %}Request A Trip{% endblock %}
 {% block body_block %}
 
 
@@ -31,16 +31,13 @@
                 <input type="text" name="destination" id="destination" tabindex="2"
                             class="form-control" placeholder="Destination">
             </div>
-            <div class="form-group" id="date-div">
-                <input type="text" name="trip_time" id='trip_time'
-                        value="" class="form-control" placeholder="Trip time (10-Mar-2016 9:00AM) ">
-                    <script type="text/javascript">
-                        $(function(){
-                        $('#trip_time').dtpicker();
-                        });
-                    </script>
+            <div class="form-group">
+                <input type="date" name="date_of_trip" id="date_of_trip" class="form-control">
             </div>
 
+            <div class="form-group">
+                <input type="time" name="time_of_trip" id="time_of_trip" class="form-control">
+            </div>
 
             <div class="form-group">
                 <div class="row">
@@ -80,16 +77,16 @@
 
                 <tr>
                     <td>
-                        {{ trips.source }}
+                        {{ trips.source.location_name }}
                     </td>
                     <td>
-                        {{ trips.destination }}
+                        {{ trips.destination.location_name }}
                     </td>
                     <td>
                         {{ trips.trip_time }}
                     </td>
                     <td>
-                        {{ trips.car_of_trip }}
+                        {{ trips.car_of_trip.registration_number }}
                     </td>
                 </tr>
         {%  endfor %}
