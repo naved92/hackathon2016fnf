@@ -40,17 +40,37 @@
 
     </div>
 
-                        <div class="col-md-4">
+                        <div class="col-md-10">
 
                         </div>
 
-                        <div class="col-md-4">
+                        <div class="col-md-pull-2">
     {% ifequal userprofile.user request.user %}
                         <a href="{% url 'updateinfo' %}">Update Info</a>
     {% endifequal %}
 
                         </div>
+    <div>
+    <br>
+    </div>
+    <div class="col-md-4"
+    >
+    <strong>User Rating</strong>
 
+    </div>
+    <div>
+    <br>
+    </div>
+    <div class="col-md-1">.
+    </div>
+    <div>
+    <img src="{% static 'images/rating.jpg' %} ">
+    <img src="{% static 'images/leaderboard.png' %} ">
+
+    </div>
+
+    <div>
+    </div>
 
     <section id="page-breadcrumb">
         <div class="vertical-center sun">
