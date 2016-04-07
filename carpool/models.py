@@ -82,7 +82,7 @@ class Trip(models.Model):
     created_by=models.ForeignKey(UserProfile,related_name='userprofile')
     source=models.ForeignKey(Location,related_name="source")
     destination=models.ForeignKey(Location,related_name="destination")
-    driver_of_trip=models.ForeignKey(Driver)
+    driver_of_trip=models.ForeignKey(Driver, null=True)
     trip_time=models.DateTimeField(blank=True)
     car_of_trip=models.ForeignKey(Car)
     trip_status_choices = (
