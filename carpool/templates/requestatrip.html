@@ -5,17 +5,12 @@
 {% block body_block %}
 
 
-
-
-
 <div class="panel-body">
 
     <div class="row">
         <div class="col-md-4">
-
-
         </div>
-    <div class="col-md-4">
+        <div class="col-md-4">
             <form id="requestatrip-form" action="{% url 'requestatrip' %}" method="post" role="form"
                     style="display: block;"> {% csrf_token %}
             {% csrf_token %}
@@ -40,6 +35,11 @@
             </div>
 
             <div class="form-group">
+                <input type="number" name="seats" placeholder="required number of seats"
+                       id = "seats" class="form-control">
+            </div>
+
+            <div class="form-group">
                 <div class="row">
                     <div class="col-sm-6 col-sm-offset-3">
                         <input type="submit" name="sharecar-submit" id="sharecaR-submit"
@@ -49,6 +49,9 @@
                 </div>
             </div>
         </form>
+        </div>
+        <div class="col-lg-2">
+
         </div>
 </div>
 
@@ -73,6 +76,7 @@
                         <th>Time</th>
                         <th>Car Number</th>
                         <th>Car Owner</th>
+                        <th>Avl Seats</th>
                         <th>Action</th>
                     </tr>
                 </thead>
@@ -98,7 +102,11 @@
                             {{ trips.created_by.user.username }} </a>
                         </td>
                         <td>
-                            <a href={% url 'triprequest' %}>request</a>
+                            {{ trips.remaining_seats }}
+
+                        </td>
+                        <td>
+                            <a href="{% url 'tripapply' trips.id seats_wanted  %}">Book {{ seats_wanted }} seats</a>
                         </td>
                     </tr>
             {%  endfor %}

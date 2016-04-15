@@ -82,9 +82,10 @@ class Trip(models.Model):
     created_by=models.ForeignKey(UserProfile,related_name='userprofile')
     source=models.ForeignKey(Location,related_name="source")
     destination=models.ForeignKey(Location,related_name="destination")
-    driver_of_trip=models.ForeignKey(Driver, null=True)
+    driver_of_trip=models.ForeignKey(Driver,blank=True,null=True)
     trip_time=models.DateTimeField(blank=True)
     car_of_trip=models.ForeignKey(Car)
+    remaining_seats=models.IntegerField(blank=True,null=True)
     trip_status_choices = (
         ('a', 'approved'),
         ('d', 'disapproved'),
@@ -100,9 +101,9 @@ class TripRequest(models.Model):
     """
     Model referring to the different trip requests of the users.
     """
-
-    user_requested=models.ForeignKey(UserProfile)
-    trip_requested=models.ForeignKey(Trip)
+    seats_demand = models.IntegerField(blank=True,null=True,default=1)    #seat demand
+    user_requested=models.ForeignKey(UserProfile)    #who requested
+    trip_requested=models.ForeignKey(Trip)           #what requested
     trip_status_choices = (
         ('a', 'approved'),
         ('d', 'disapproved'),
@@ -110,8 +111,8 @@ class TripRequest(models.Model):
         ('p', 'pending'),
         ('s', 'suspended')
     )
-    requested_time=models.DateTimeField(blank=True)
-    trip_status = models.CharField(blank=False, max_length=2, choices=trip_status_choices, default='p')
+    requested_time=models.DateTimeField(blank=True) #timenow
+    trip_status = models.CharField(blank=False, max_length=2, choices=trip_status_choices, default='p') #request status
 
 
 class Ride(models.Model):

@@ -16,6 +16,7 @@ from random import randint
 from urllib2 import urlopen
 from contextlib import closing
 from ipware.ip import get_ip
+from decimal import Decimal
 
 
 import geocoder
@@ -78,6 +79,18 @@ def get_location(ip):
     except:
         print("Location could not be determined automatically")
 
+
+
+def getStatus(c):
+        trip_status_choices = {
+        'a': 'approved',
+        'd': 'disapproved',
+        'o': 'other',
+        'p': 'pending',
+        's': 'suspended'
+    }
+
+        return trip_status_choices[c];
 
 def get_ip_address(request):
     """
@@ -629,17 +642,17 @@ def sharetrip(request):
         return HttpResponseRedirect(reverse('verification'))
     elif request.POST:
 
-        searchLoc = Location.objects.get(location_name=request.POST.get('source'))
+        searchLoc = Location.objects.filter(location_name=request.POST.get('source'))
         if searchLoc:
-            source_location = searchLoc
+            source_location = searchLoc[0]
         else:
             source_lat,source_long = geocoder.google(request.POST.get('source')).latlng
             new_location = Location(location_name=request.POST.get('source'),location_lat=source_lat,location_long=source_long)
             new_location.save()
             source_location = new_location
-        searchLoc = Location.objects.get(location_name=request.POST.get('destination'))
+        searchLoc = Location.objects.filter(location_name=request.POST.get('destination'))
         if searchLoc:
-            destination_location = searchLoc
+            destination_location = searchLoc[0]
         else:
             dest_lat, dest_long = geocoder.google(request.POST.get('destination')).latlng
             new_location = Location(location_name=request.POST.get('destination'),location_long=dest_long,location_lat=dest_lat)
@@ -654,9 +667,10 @@ def sharetrip(request):
         car_reg=request.POST.get('car')
         trip_car=Car.objects.get(registration_number=car_reg)
 
-        newTripOffer=Trip(source=source_location,destination=destination_location,
-                          trip_time=trip_date_time,car_of_trip=trip_car,
-                          created_by_id=user_profile.id
+        newTripOffer=Trip(source=source_location, destination=destination_location,
+                          trip_time=trip_date_time, car_of_trip=trip_car,
+                          created_by_id=user_profile.id,
+                          remaining_seats=trip_car.number_of_seats
                           )
         newTripOffer.save()
 
@@ -956,18 +970,25 @@ def requestatrip(request):
     if user_profile.verification_status == 'p':
         return HttpResponseRedirect(reverse('verification'))
     elif request.POST:
-        source_loc= Location.objects.get(location_name=request.POST.get('source'))
-        destination_loc = Location.objects.get(location_name=request.POST.get('destination'))
-
+        source_loc_arr= Location.objects.filter(location_name=request.POST.get('source'))
+        destination_loc_arr = Location.objects.filter(location_name=request.POST.get('destination'))
+        if source_loc_arr and destination_loc_arr:
+            source_loc = source_loc_arr[0]
+            destination_loc = destination_loc_arr[0]
+        else:
+            no_trip_found = []
+            return render_to_response('requestatrip.html',{'no_trips':no_trip_found},context)
         trip_date = datetime.strptime(request.POST.get('date_of_trip'),'%Y-%m-%d')
         trip_time = datetime.time(datetime.strptime(request.POST.get('time_of_trip'),'%H:%M'))
         trip_date_time = datetime.combine(trip_date,trip_time)
         end_trip_time = trip_date_time + timedelta(hours=1)
         available_trips = Trip.objects.filter(source=source_loc, destination=destination_loc,
-                                              trip_time__range=[trip_date_time,end_trip_time])
-
+                                              trip_time__range=[trip_date_time,end_trip_time],
+                                              remaining_seats__gte=request.POST.get('seats')).exclude(created_by=user_profile)
+        seat_wanted = request.POST.get('seats')
         if (available_trips):
-            return render_to_response('requestatrip.html', {'available_trips':available_trips}, context)
+            return render_to_response('requestatrip.html', {'available_trips':available_trips,
+                                                            'seats_wanted':seat_wanted}, context)
         else:
             no_trip_found = []
             return render_to_response('requestatrip.html',{'no_trips':no_trip_found},context)
@@ -976,7 +997,7 @@ def requestatrip(request):
 
 
 @login_required(login_url='/sharecar')
-def triprequest(request,tripid):
+def tripapply(request,trip_id, seat_count):
     """
     the rider requests to ride in a trip that was shared by someone else
     :param request: request
@@ -989,13 +1010,13 @@ def triprequest(request,tripid):
     if user_profile.verification_status == 'p':
         return HttpResponseRedirect(reverse('verification'))
     else:
-        who_blocked=UserProfile.objects.get(user=request.user)
-        who_got_blocked=UserProfile.objects.get(user=User.objects.get(id=user_id))
-
-        blockrecord= Block.objects.filter(blocker=who_blocked,blocked=who_got_blocked)
-        blockrecord.delete()
-        return HttpResponseRedirect(reverse('profile',kwargs={'user_id':request.user.id}))
-
+        trip = Trip.objects.get(id=trip_id)
+        trip_request = TripRequest(user_requested=user_profile,
+                                   trip_requested= trip,
+                                   requested_time=datetime.now(),
+                                   seats_demand=seat_count)
+        trip_request.save()
+        return pendingrequests(request)
 
 
 @login_required(login_url='/sharecar/')
@@ -1014,10 +1035,45 @@ def pendingrequests(request):
     if user_profile.verification_status == 'p':
         return HttpResponseRedirect(reverse('verification'))
     else:
-        user = request.user.userprofile
-        outgoing_requests = TripRequest.objects.filter(user_requested=user)
-        outgoing_trips = Trip.objects.filter(id=outgoing_requests)
+        outgoing_requests_p = TripRequest.objects.filter(user_requested=user_profile, trip_status="p")
+        outgoing_requests_a = TripRequest.objects.filter(user_requested=user_profile, trip_status="a")
+        outgoing_requests=outgoing_requests_a|outgoing_requests_p
+        #print outgoing_requests
+        all_trips_created_by_user = Trip.objects.filter(created_by=user_profile,trip_status="p")
+        pending_requests_of_others = TripRequest.objects.filter(trip_status="p").exclude(user_requested=user_profile)
+        incoming_requests = []
+        for trip_reqs in pending_requests_of_others:
+            for trips in all_trips_created_by_user:
+                if trip_reqs.trip_requested== trips:
+                    incoming_requests.append(trip_reqs)
+        #incoming_requests = TripRequest.objects.filter(trip_requested=all_trips_created_by_user,trip_status="p")
+        return render_to_response('pendingrequests.html',{'incoming':incoming_requests,
+                                                          'outgoing':outgoing_requests
+                                                          },context)
 
-        all_trips_created_by_user = Trip.objects.filter(created_by=user)
-        incoming_requests = TripRequest.objects.filter(trip_requested=all_trips_created_by_user,trip_status="p")
-        return render_to_response('pendingrequests.html',{'incoming':incoming_requests, 'outgoing':outgoing_trips},context)
+@login_required(login_url='/sharecar')
+def approve(request,trip_request_id,trip_id, seat_count):
+    """
+    the rider gets approval to ride in a trip that was shared by someone else
+    :param request: request
+    :param trip id: that he/she wants to join
+    :param seat_count: how many seats
+    :return: Unblocks the user id
+
+    """
+    context = RequestContext(request)
+    user_profile = request.user.userprofile
+    if user_profile.verification_status == 'p':
+        return HttpResponseRedirect(reverse('verification'))
+    else:
+        trip = Trip.objects.get(id=trip_id)
+        trip.remaining_seats=(Decimal)(trip.remaining_seats)-Decimal(seat_count)
+        trip.save()
+
+        trip_request=TripRequest.objects.get(id=trip_request_id)
+        trip_request.trip_status="a"
+        trip_request.save()
+
+        return pendingrequests(request)
+
+

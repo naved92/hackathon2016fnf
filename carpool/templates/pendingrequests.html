@@ -3,133 +3,135 @@
 <!DOCTYPE html>
 {% block title %}Pending Requests{% endblock %}
 {% block body_block %}
-<div class="row">
-    <div class="col-lg-3">
 
-    </div>
-    <div class="col-lg-6">
-        {% if incoming %}
-        <h3>Incoming Requests</h3>
-            <div class="container">
-                <div class="table-responsive">
-                    <table class="table">
-                        <thead>
+    <div class="row">
+        <div class="col-lg-1">
+
+        </div>
+         <div class="col-lg-6">
+            {% if incoming %}
+                <h3>Incoming Requests</h3>
+                    <div class="container">
+                        <div class="table-responsive">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Rider</th>
+                                        <th>Source</th>
+                                        <th>Destination</th>
+                                        <th>Departure Time</th>
+                                        <th>Car Number</th>
+                                        <th>Requested Seats</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+
+                              {% for requests in incoming %}
+
                             <tr>
-                                <th>Source</th>
-                                <th>Destination</th>
-                                <th>Time</th>
-                                <th>Car Number</th>
+                                <td>
+                                    <a href="</a>{% url 'profile' requests.user_requested.user_id%}">
+                                        {{ requests.user_requested }}
+                                    </a>
+                                </td>
+                                <td>
+                                    {{ requests.trip_requested.source.location_name }}
+                                </td>
+                                <td>
+                                    {{ requests.trip_requested.destination.location_name }}
+                                </td>
+                                <td>
+                                    {{ requests.trip_requested.trip_time }}
+                                </td>
+                                <td>
+                                    {{ requests.trip_requested.car_of_trip.registration_number }}
+                                </td>
+                                <td>
+                                    {{ requests.seats_demand }}
+                                </td>
+                                <td>
+                                    <a href="{% url 'approve' requests.id requests.trip_requested.id requests.seats_demand %}">Approve</a>
+                                    /
+                                    <a href="">Cancel</a>
+                                </td>
                             </tr>
-                        </thead>
-                        <tbody>
-
-                        {% for trips in available_trips %}
-
-                        <tr>
-                            <td>
-                                {{ trips.source }}
-                            </td>
-                            <td>
-                                {{ trips.destination }}
-                            </td>
-                            <td>
-                                {{ trips.trip_time }}
-                            </td>
-                            <td>
-                                {{ trips.car_of_trip }}
-                            </td>
-                        </tr>
-                        {%  endfor %}
-                    </tbody>
-                </table>
+                            {%  endfor %}
+                        </tbody>
+                    </table>
+                </div>
             </div>
+
+            {% endif %}
         </div>
 
-        {% endif %}
+        <div class="col-lg-3">
+
+        </div>
     </div>
-    <div class="col-lg-3">
 
+
+
+         <div class="row">
+        <div class="col-lg-1">
+
+        </div>
+        <div class="col-lg-6">
+            {% if outgoing %}
+                <h3>Outgoing Requests</h3>
+                    <div class="container">
+                        <div class="table-responsive">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Owner</th>
+                                        <th>Source</th>
+                                        <th>Destination</th>
+                                        <th>Departure Time</th>
+                                        <th>Car Number</th>
+                                        <th>Requested Seats</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+
+                              {% for requests in outgoing %}
+
+                            <tr>
+                                <td>
+                                    <a href="{% url 'profile' requests.trip_requested.created_by.user_id %}">
+                                        {{ requests.trip_requested.created_by }}</a>
+                                </td>
+                                <td>
+                                    {{ requests.trip_requested.source.location_name }}
+                                </td>
+                                <td>
+                                    {{ requests.trip_requested.destination.location_name }}
+                                </td>
+                                <td>
+                                    {{ requests.trip_requested.trip_time }}
+                                </td>
+                                <td>
+                                    {{ requests.trip_requested.car_of_trip.registration_number }}
+                                </td>
+                                <td>
+                                    {{ requests.seats_demand }}
+                                </td>
+                                <td>
+                                    {{ requests.trip_status}}
+                                </td>
+                            </tr>
+                            {%  endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            {% endif %}
+        </div>
+        <div class="col-lg-3">
+
+        </div>
     </div>
-</div>
-
-    <div class="container">
-        <div class="table-responsive">
-        <table class="table">
-            <thead>
-                <tr>
-                    <th>Source</th>
-                    <th>Destination</th>
-                    <th>Time</th>
-                    <th>Car Number</th>
-
-                </tr>
-            </thead>
-        <tbody>
-
-        {% for trips in available_trips %}
-
-                <tr>
-                    <td>
-                        {{ trips.source }}
-                    </td>
-                    <td>
-                        {{ trips.destination }}
-                    </td>
-                    <td>
-                        {{ trips.trip_time }}
-                    </td>
-                    <td>
-                        {{ trips.car_of_trip }}
-                    </td>
-                </tr>
-        {%  endfor %}
-</tbody>
-</table>
-</div>
-</div>
-
-<div>
-    <hr>
-    <hr>
-</div>
-
-<div class="container">
-        <div class="table-responsive">
-        <table class="table">
-            <thead>
-                <tr>
-                    <th>Source</th>
-                    <th>Destination</th>
-                    <th>Time</th>
-                    <th>Car Number</th>
-
-                </tr>
-            </thead>
-        <tbody>
-
-        {% for trips in available_trips %}
-
-                <tr>
-                    <td>
-                        {{ trips.source }}
-                    </td>
-                    <td>
-                        {{ trips.destination }}
-                    </td>
-                    <td>
-                        {{ trips.trip_time }}
-                    </td>
-                    <td>
-                        {{ trips.car_of_trip }}
-                    </td>
-                </tr>
-        {%  endfor %}
-</tbody>
-</table>
-</div>
-</div>
-
-
-
 {% endblock %}
 

@@ -78,7 +78,7 @@ WSGI_APPLICATION = 'hackathon2016fnf.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.mysql',
+        'ENGINE': 'django.db.backends.sqlite3',
         'NAME': 'hackathonfnfdb',
         'USER': 'hackathonfnfuser',
         'PASSWORD': 'hackathonfnf',

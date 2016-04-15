@@ -23,5 +23,8 @@ urlpatterns = [
         url(r'^requestatrip/$',views.requestatrip,name='requestatrip'),
         url(r'^pendingrequests/$', views.pendingrequests,name='pendingrequests'),
         url(r'^previoustrips/$', views.previoustrips,name='previoustrips'),
+        url(r'^tripapply/(?P<trip_id>[0-9]+)/(?P<seat_count>[0-9])/$',views.tripapply,name='tripapply'),
+        url(r'^approve/(?P<trip_request_id>[0-9]+)/(?P<trip_id>[0-9]+)/(?P<seat_count>[0-9])/$',views.approve,name='approve'),
+
 
         ]
